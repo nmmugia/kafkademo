@@ -1,4 +1,4 @@
-package com.gitlab.seemugia1.kafkademo;
+package com.gitlab.seemugia1.kafkademo.domain.model;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
