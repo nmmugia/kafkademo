@@ -1,27 +1,41 @@
 package com.gitlab.seemugia1.kafkademo;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Entity
+@Table(name = "insurance_policy")
 public class InsurancePolicy extends PanacheEntityBase {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "policy_holder_name")
     private String policyHolderName;
+
+    @Column(name = "coverage_amount")
     private BigDecimal coverageAmount;
+
+    @Column(name = "premium")
     private BigDecimal premium;
+
+    @Column(name = "start_date")
     private LocalDate startDate;
+
+    @Column(name = "end_date")
     private LocalDate endDate;
-    private String status; // ACTIVE, CANCELLED, EXPIRED
+
+    @Column(name = "status")
+    private String status;
 
     public InsurancePolicy() {
     }

@@ -1,13 +1,16 @@
 version: '3.8'
+
 services:
   postgres:
     image: postgres:latest
     environment:
+      POSTGRES_USER: insurance_user
+      POSTGRES_PASSWORD: insurance_pass
       POSTGRES_DB: insurance_db
-      POSTGRES_USER: your_username
-      POSTGRES_PASSWORD: your_password
     ports:
       - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
 
   redis:
     image: redis:latest
@@ -15,14 +18,16 @@ services:
       - "6379:6379"
 
   kafka:
-    image: wurstmeister/kafka:latest
+    image: wurstmeister/kafka:2.12-2.4.1
     environment:
-      KAFKA_ADVERTISED_LISTENERS: INSIDE://kafka:9092,OUTSIDE://localhost:9094
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INSIDE:PLAINTEXT,OUTSIDE:PLAINTEXT
-      KAFKA_LISTENERS: INSIDE://0.0.0.0:9092,OUTSIDE://0.0.0.0:9094
+      KAFKA_BROKER_ID: 1
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092
     ports:
-      - "9094:9094"
+      - "9092:9092"
     depends_on:
       - zookeeper
 
@@ -32,10 +37,21 @@ services:
       - "2181:2181"
 
   insurance-app:
-    build: .
-    depends_on:
-      - postgres
-      - redis
-      - kafka
+    build:
+      context: .
+      dockerfile: src/main/docker/Dockerfile.jvm
+    environment:
+      QUARKUS_DATASOURCE_USERNAME: insurance_user
+      QUARKUS_DATASOURCE_PASSWORD: insurance_pass
+      QUARKUS_DATASOURCE_JDBC_URL: jdbc:postgresql://postgres:5432/insurance_db
+      QUARKUS_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+      QUARKUS_REDIS_HOSTS: redis://redis:6379
     ports:
       - "8080:8080"
+    depends_on:
+      - postgres
+      - kafka
+      - redis
+
+volumes:
+  pgdata:
