@@ -4,6 +4,11 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import org.eclipse.microprofile.reactive.messaging.Incoming;
 import org.jboss.logging.Logger;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+
 import jakarta.transaction.Transactional;
 
 @ApplicationScoped
@@ -13,16 +18,26 @@ public class InsurancePolicyKafkaConsumer {
 
     @Inject
     InsurancePolicyRepository repository;
+    private final ObjectMapper objectMapper;
+
+    public InsurancePolicyKafkaConsumer() {
+        objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new JavaTimeModule());
+        objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+    }
 
     @Incoming("policy-consumer")
     @Transactional
-    public void consume(InsurancePolicyEvent event) {
-        LOGGER.infof("Consuming Kafka message: %s", event);
+    public void consume(String message) {
+        LOGGER.infof("Consuming Kafka message: %s", message);
 
         try {
+            InsurancePolicyEvent event = objectMapper.readValue(message, InsurancePolicyEvent.class);
             switch (event.getAction()) {
                 case "created":
-                    persistPolicy(event.getPolicy());
+                    InsurancePolicy policy = event.getPolicy();
+                    policy.setId(null);
+                    persistPolicy(policy);
                     break;
                 case "updated":
                     updatePolicy(event.getPolicy());

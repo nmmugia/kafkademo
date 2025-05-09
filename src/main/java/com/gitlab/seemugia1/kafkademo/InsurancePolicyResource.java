@@ -8,7 +8,6 @@ import jakarta.ws.rs.core.Response;
 import org.jboss.logging.Logger;
 
 import java.util.List;
-import java.util.Optional;
 
 @Path("/policies")
 @Produces(MediaType.APPLICATION_JSON)
