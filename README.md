@@ -1,54 +1,136 @@
-# io.github.nmmugia.kafkademo
+# 📄 README - Insurance Policy Kafka Service (Quarkus)
 
-This project uses Quarkus, the Supersonic Subatomic Java Framework.
+## ✉️ Pendahuluan
 
-If you want to learn more about Quarkus, please visit its website: <https://quarkus.io/>.
+Repositori ini adalah implementasi studi kasus backend untuk proses rekrutmen yang diminta oleh Tim Digitalisasi Proses Bisnis. Aplikasi ini dibangun menggunakan Quarkus dan Java 17 dengan integrasi Kafka dan PostgreSQL. Aplikasi berfungsi sebagai layanan backend untuk menerima pesan dari Kafka, memanipulasi data polis asuransi, dan menyimpannya ke database.
 
-## Running the application in dev mode
+## 🧾 Ringkasan Studi Kasus
 
-You can run your application in dev mode that enables live coding using:
+### 🎯 Tujuan:
 
-```shell script
-./mvnw quarkus:dev
+Membangun layanan backend yang:
+
+1. Menerima data dari Kafka topic
+2. Melakukan manipulasi data sesuai kebutuhan
+3. Menulis ulang ke Kafka atau menyimpan hasilnya ke database
+
+
+## ⚙️ Teknologi yang Digunakan
+
+* **Bahasa Pemrograman:** Java 17
+* **Framework:** Quarkus
+* **Messaging:** Apache Kafka
+* **Database:** PostgreSQL
+* **Build Tool:** Maven Wrapper
+* **Containerization:** Docker & Docker Compose
+
+## 📂 Struktur Proyek
+
+```
+├── src
+│   ├── main
+│   │   ├── java/com/gitlab/seemugia1/kafkademo
+│   │   │   ├── domain           # Model domain seperti InsurancePolicy dan Event
+│   │   │   ├── repository       # Interface & implementasi repository
+│   │   │   ├── resource         # REST API endpoint untuk InsurancePolicy
+│   │   │   └── service          # Kafka consumer dan business logic
+│   │   └── resources            # Konfigurasi aplikasi (application.properties)
+│   └── test                    # Integration & unit test
+├── docker-compose.yml          # Setup untuk PostgreSQL, Kafka, dan app
+├── src/main/docker/Dockerfile.jvm # Dockerfile dengan build otomatis
+├── pom.xml                     # Dependency Maven
+└── README.md                   # Dokumentasi ini
 ```
 
-> **_NOTE:_**  Quarkus now ships with a Dev UI, which is available in dev mode only at <http://localhost:8080/q/dev/>.
+## 📡 Arsitektur & Alur Data
 
-## Packaging and running the application
+1. **Producer** mengirimkan pesan JSON ke Kafka topic `policy-consumer`
+2. **InsurancePolicyKafkaConsumer** menerima pesan dan mendeserialisasi menjadi objek `InsurancePolicyEvent`
+3. Berdasarkan nilai `action`, data diproses untuk `create`, `update`, atau `delete`
+4. Data disimpan atau dimodifikasi di PostgreSQL menggunakan JPA
+5. Endpoint REST disediakan untuk CRUD & pengujian manual
 
-The application can be packaged using:
+## 🔌 API Endpoint
 
-```shell script
-./mvnw package
+Semua endpoint berbasis RESTful dan berada di `/policies`
+
+### POST /policies
+
+Membuat polis asuransi baru
+
+```json
+{
+    "policyHolderName": "John Doe",
+    "coverageAmount": 2000000.00,
+    "premium": 9000.00,
+    "startDate": "2025-01-01",
+    "endDate": "2026-01-01",
+    "status": "INACTIVE"
+  }
 ```
 
-It produces the `quarkus-run.jar` file in the `target/quarkus-app/` directory.
-Be aware that it’s not an _über-jar_ as the dependencies are copied into the `target/quarkus-app/lib/` directory.
 
-The application is now runnable using `java -jar target/quarkus-app/quarkus-run.jar`.
+### PUT /policies/{id}
 
-If you want to build an _über-jar_, execute the following command:
+Mengambil polis berdasarkan ID
 
-```shell script
-./mvnw package -Dquarkus.package.jar.type=uber-jar
+```json
+{
+    "policyHolderName": "John Doe",
+    "coverageAmount": 2000000.00,
+    "premium": 9000.00,
+    "startDate": "2025-01-01",
+    "endDate": "2026-01-01",
+    "status": "INACTIVE"
+  }
 ```
 
-The application, packaged as an _über-jar_, is now runnable using `java -jar target/*-runner.jar`.
 
-## Creating a native executable
+### GET /policies
 
-You can create a native executable using:
+Mengambil semua polis
 
-```shell script
-./mvnw package -Dnative
+### GET /policies/{id}
+
+Mengambil polis berdasarkan ID
+
+### DELETE /policies/{id}
+
+Menghapus polis berdasarkan ID
+
+## ▶️ Menjalankan Aplikasi
+
+Cukup jalankan:
+
+```bash
+docker-compose up --build
 ```
 
-Or, if you don't have GraalVM installed, you can run the native executable build in a container using:
+Tidak perlu menjalankan `./mvnw` secara manual karena Dockerfile telah menangani proses build secara otomatis.
 
-```shell script
-./mvnw package -Dnative -Dquarkus.native.container-build=true
+## 📥 Kafka Topik
+
+* **Topik Masuk:** `policy-consumer`
+* Format pesan:
+
+```json
+{
+  "action": "created", // atau "updated", "deleted"
+  "policy": {
+    "id": 1,
+    "policyHolderName": "Alice",
+    "coverageAmount": 100000,
+    "premium": 100000,
+    "status": "ACTIVE"
+  }
+}
 ```
 
-You can then execute your native executable with: `./target/io.github.nmmugia.kafkademo-1.0.0-SNAPSHOT-runner`
+## 📝 Catatan Tambahan
 
-If you want to learn more about building native executables, please consult <https://quarkus.io/guides/maven-tooling>.
+* Format pesan Kafka harus valid JSON
+* Tidak ada autentikasi pada tahap ini (asumsi untuk studi kasus)
+
+## 🙏 Penutup
+
+Terima kasih atas kesempatan yang diberikan. Aplikasi ini dibangun dengan asumsi dan improvisasi kreatif sesuai instruksi studi kasus.

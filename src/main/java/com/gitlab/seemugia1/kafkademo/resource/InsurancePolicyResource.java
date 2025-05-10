@@ -1,4 +1,4 @@
-package com.gitlab.seemugia1.kafkademo.service;
+package com.gitlab.seemugia1.kafkademo.resource;
 
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
@@ -8,7 +8,7 @@ import jakarta.ws.rs.core.Response;
 import org.jboss.logging.Logger;
 
 import com.gitlab.seemugia1.kafkademo.repository.InsurancePolicyRepository;
-import com.gitlab.seemugia1.kafkademo.resource.InsurancePolicyKafkaService;
+import com.gitlab.seemugia1.kafkademo.service.InsurancePolicyKafkaService;
 import com.gitlab.seemugia1.kafkademo.domain.model.InsurancePolicy;
 
 import java.util.List;

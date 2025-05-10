@@ -1,4 +1,4 @@
-package com.gitlab.seemugia1.kafkademo.resource;
+package com.gitlab.seemugia1.kafkademo.service;
 
 import com.gitlab.seemugia1.kafkademo.domain.model.InsurancePolicy;
 import com.gitlab.seemugia1.kafkademo.domain.event.InsurancePolicyEvent;

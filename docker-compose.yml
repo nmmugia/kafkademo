@@ -12,11 +12,6 @@ services:
     volumes:
       - pgdata:/var/lib/postgresql/data
 
-  redis:
-    image: redis:latest
-    ports:
-      - "6379:6379"
-
   kafka:
     image: wurstmeister/kafka:2.12-2.4.1
     environment:
@@ -38,7 +33,7 @@ services:
     ports:
       - "2181:2181"
 
-  insurance-app:
+  kafkademo:
     build:
       context: .
       dockerfile: src/main/docker/Dockerfile.jvm
@@ -47,13 +42,11 @@ services:
       QUARKUS_DATASOURCE_PASSWORD: insurance_pass
       QUARKUS_DATASOURCE_JDBC_URL: jdbc:postgresql://postgres:5432/insurance_db
       QUARKUS_KAFKA_BOOTSTRAP_SERVERS: kafka:9092
-      QUARKUS_REDIS_HOSTS: redis://redis:6379
     ports:
       - "8080:8080"
     depends_on:
       - postgres
       - kafka
-      - redis
 
 volumes:
   pgdata:
