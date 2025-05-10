@@ -103,10 +103,10 @@ Menghapus polis berdasarkan ID
 Cukup jalankan:
 
 ```bash
+./mvnw package
 docker-compose up --build
 ```
 
-Tidak perlu menjalankan `./mvnw` secara manual karena Dockerfile telah menangani proses build secara otomatis.
 
 ## 📥 Kafka Topik
 
